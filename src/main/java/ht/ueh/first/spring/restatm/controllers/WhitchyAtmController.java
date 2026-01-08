@@ -3,11 +3,9 @@ package ht.ueh.first.spring.restatm.controllers;
 import ht.ueh.first.spring.restatm.manager.AtmManager;
 import ht.ueh.first.spring.restatm.models.Account;
 import ht.ueh.first.spring.restatm.models.Transaction;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -68,9 +66,14 @@ public class WhitchyAtmController {
      * TODO : Retourner 201 Created en cas de succès
      * TODO : Retourner 400 Bad Request en cas d'erreur
      */
-    public ResponseEntity<Account> createAccount(Account account) {
-        // TODO : Implémenter cette méthode avec try-catch
-        return null;
+    @PostMapping("/accounts")
+    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
+        try {
+          Account created = atmManager.createAccount(account);
+          return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

@@ -146,11 +146,17 @@ public class WhitchyAtmController {
      * TODO : Similaire au dépôt, mais avec withdraw()
      * TODO : Gérer le cas de solde insuffisant
      */
+    @PostMapping("/accounts/{accountNumber}/withdraw")
     public ResponseEntity<Account> withdraw(
-            String accountNumber,
-            Map<String, Double> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, Double> request) {
+        try {
+            double amount = request.get("amount");
+            Account updatedAccount = atmManager.withdraw(accountNumber, amount);
+            return ResponseEntity.ok(updatedAccount);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

@@ -213,9 +213,13 @@ public class WhitchyAtmController {
      * TODO : Ajouter @GetMapping("/transactions")
      * TODO : Retourner toutes les transactions du système
      */
+    @GetMapping("/transactions")
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        // TODO : Implémenter cette méthode
-        return null;
+        try {
+            return ResponseEntity.ok(atmManager.getAllTransactions());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // ============================================

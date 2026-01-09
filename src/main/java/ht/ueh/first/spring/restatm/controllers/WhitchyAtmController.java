@@ -197,9 +197,14 @@ public class WhitchyAtmController {
      * TODO : Ajouter @GetMapping("/accounts/{accountNumber}/transactions")
      * TODO : Retourner la liste des transactions
      */
-    public ResponseEntity<List<Transaction>> getTransactions(String accountNumber) {
-        // TODO : Implémenter cette méthode
-        return null;
+    @GetMapping("/accounts/{accountNumber}/transactions")
+    public ResponseEntity<List<Transaction>> getTransactions(@PathVariable String accountNumber) {
+        try {
+            List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+            return ResponseEntity.ok(transactions);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

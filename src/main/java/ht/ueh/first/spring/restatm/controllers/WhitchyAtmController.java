@@ -82,9 +82,19 @@ public class WhitchyAtmController {
      * TODO : Ajouter @GetMapping("/accounts/{accountNumber}/balance")
      * TODO : Retourner un Map avec accountNumber et balance
      */
-    public ResponseEntity<Map<String, Object>> getBalance(String accountNumber) {
-        // TODO : Implémenter cette méthode
-        return null;
+    @GetMapping("/accounts/{accountNumber}/balance")
+    public ResponseEntity<Map<String, Object>> getBalance(@PathVariable String accountNumber) {
+        for  (Account account : atmManager.getAllAccounts()) {
+            if (account.getAccountNumber().equals(accountNumber)) {
+                double balance = atmManager.getBalance(accountNumber);
+                Map<String, Object> result = Map.of(
+                        "accountNumber", accountNumber,
+                        "balance", balance
+                );
+                return ResponseEntity.ok(result);
+            }
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     /**

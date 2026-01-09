@@ -126,11 +126,17 @@ public class WhitchyAtmController {
      * TODO : Extraire "amount" de la Map
      * TODO : Gérer les erreurs (compte inexistant, montant invalide)
      */
+    @PostMapping("/accounts/{accountNumber}/deposit")
     public ResponseEntity<Account> deposit(
-            String accountNumber,
-            Map<String, Double> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, Double> request) {
+        try {
+            double amount = request.get("amount");
+            Account updatedAccount = atmManager.deposit(accountNumber, amount);
+            return ResponseEntity.ok(updatedAccount);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

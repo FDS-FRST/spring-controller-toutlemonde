@@ -104,11 +104,18 @@ public class WhitchyAtmController {
      * TODO : Recevoir le PIN dans le body (Map<String, String>)
      * TODO : Retourner un Map avec "valid" : true/false
      */
+    @PostMapping("/accounts/{accountNumber}/verify-pin")
     public ResponseEntity<Map<String, Boolean>> verifyPin(
-            String accountNumber,
-            Map<String, String> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, String> request) {
+        try {
+            String pin = request.get("pin");
+            boolean isValid = atmManager.verifyPin(accountNumber, pin);
+            Map<String, Boolean> result = Map.of("valid", isValid);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

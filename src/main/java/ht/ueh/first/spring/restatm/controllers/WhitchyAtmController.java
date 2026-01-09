@@ -31,6 +31,14 @@ public class WhitchyAtmController {
     }
 
     /**
+     * Page d'acceuil : Ajout Perso
+     */
+    @GetMapping
+    public String home() {
+        return "Welcome to Whitchy ATM API!";
+    }
+
+    /**
      * Endpoint 1 : Récupère la liste de tous les comptes
      *
      * TODO : Ajouter @GetMapping("/accounts")
@@ -167,9 +175,20 @@ public class WhitchyAtmController {
      * TODO : Convertir amount en double : ((Number) request.get("amount")).doubleValue()
      * TODO : Retourner un message de succès ou d'erreur
      */
-    public ResponseEntity<Map<String, String>> transfer(Map<String, Object> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+    @PostMapping("/transfer")
+    public ResponseEntity<Map<String, String>> transfer(@RequestBody Map<String, Object> request) {
+        try {
+            String fromAccount = (String) request.get("from");
+            String toAccount = (String) request.get("to");
+            double amount = ((Number) request.get("amount")).doubleValue();
+
+            atmManager.transfer(fromAccount, toAccount, amount);
+            Map<String, String> result = Map.of("message", "Transfer successful");
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            Map<String, String> error = Map.of("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
     /**

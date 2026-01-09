@@ -234,6 +234,15 @@ public class WhitchyAtmController {
      * - Retourne 200 si succès, 404 si compte inexistant
      * - Note : Vous devrez d'abord ajouter la méthode deleteAccount() dans AtmManager
      */
+    @DeleteMapping("/accounts/{accountNumber}")
+    public ResponseEntity<Map<String, String>> deleteAccount(@PathVariable String accountNumber) {
+        try {
+            atmManager.deleteAccount(accountNumber);
+            return ResponseEntity.ok().body(Map.of("message", "Account deleted"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     /**
      * EXERCICE 2 : Ajouter un endpoint PUT

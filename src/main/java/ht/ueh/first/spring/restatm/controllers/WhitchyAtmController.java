@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -280,6 +281,17 @@ public class WhitchyAtmController {
      * - Retourne uniquement les dépôts
      * - Filtrer les transactions où type = "DEPOT"
      */
+    @GetMapping("/accounts/{accountNumber}/transactions/deposits")
+    public ResponseEntity<List<Transaction>> getTransactionsDeposits(@PathVariable String accountNumber) {
+        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        List<Transaction> depositTransactions = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            if (transaction.getAccountNumber().equals(accountNumber) && transaction.getType().equals("DEPOT")) {
+                depositTransactions.add(transaction);
+            }
+        }
+        return ResponseEntity.ok(depositTransactions);
+    }
 
     /**
      * EXERCICE 4 : Statistiques de compte

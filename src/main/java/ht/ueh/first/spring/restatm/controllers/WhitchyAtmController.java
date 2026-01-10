@@ -285,12 +285,20 @@ public class WhitchyAtmController {
     public ResponseEntity<List<Transaction>> getTransactionsDeposits(@PathVariable String accountNumber) {
         List<Transaction> transactions = atmManager.getTransactions(accountNumber);
         List<Transaction> depositTransactions = new ArrayList<>();
+        boolean found = false;
         for (Transaction transaction : transactions) {
-            if (transaction.getAccountNumber().equals(accountNumber) && transaction.getType().equals("DEPOT")) {
-                depositTransactions.add(transaction);
+            if (transaction.getAccountNumber().equals(accountNumber)){
+                found = true;
+                if (transaction.getType().equals("DEPOT")) {
+                    depositTransactions.add(transaction);
+                }
             }
         }
-        return ResponseEntity.ok(depositTransactions);
+        if (found) {
+            return ResponseEntity.ok(depositTransactions);
+        }else{
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
@@ -300,5 +308,9 @@ public class WhitchyAtmController {
      * - Retourne : nombre de transactions, total dépôts, total retraits, solde actuel
      * - Format : Map<String, Object>
      */
+//    @GetMapping("/accounts/{accountNumber}/stats")
+//    public ResponseEntity<Map<String, String>> getAccountStats(@PathVariable String accountNumber) {
+//        return ResponseEntity.ok(Map.of("", ""));
+//    }
 }
 

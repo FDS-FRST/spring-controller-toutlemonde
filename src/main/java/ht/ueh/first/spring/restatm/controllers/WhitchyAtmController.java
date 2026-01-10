@@ -252,6 +252,26 @@ public class WhitchyAtmController {
      * - Body : { "oldPin": "1234", "newPin": "5678" }
      * - Vérifier l'ancien PIN avant de changer
      */
+    @PutMapping("/accounts/{accountNumber}/pin")
+    public ResponseEntity<Map<String, String>> updatePin(
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, String> request) {
+        try {
+            for (Account account : atmManager.getAllAccounts()){
+                if (account.getAccountNumber().equals(accountNumber)) {
+                    if (account.getPin().equals(request.get("oldPin"))) {
+                        account.setPin(request.get("newPin"));
+                        return ResponseEntity.ok().body(Map.of("message", "Account updated : pin modifié"));
+                    }else {
+                        return ResponseEntity.badRequest().build();
+                    }
+                }
+            }
+            return ResponseEntity.badRequest().build();
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     /**
      * EXERCICE 3 : Filtrer les transactions

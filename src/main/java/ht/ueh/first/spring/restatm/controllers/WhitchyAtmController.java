@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -308,9 +309,31 @@ public class WhitchyAtmController {
      * - Retourne : nombre de transactions, total dépôts, total retraits, solde actuel
      * - Format : Map<String, Object>
      */
-//    @GetMapping("/accounts/{accountNumber}/stats")
-//    public ResponseEntity<Map<String, String>> getAccountStats(@PathVariable String accountNumber) {
-//        return ResponseEntity.ok(Map.of("", ""));
-//    }
+    @GetMapping("/accounts/{accountNumber}/stats")
+    public ResponseEntity<Map<String, Object>> getAccountStats(@PathVariable String accountNumber) {
+        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        int numberOfTransactions = 0;
+        double totalDeposits = 0.0;
+        double totalWithdrawals = 0.0;
+        Map<String, Object> stats = new HashMap<>();
+        for (Transaction transaction : transactions) {
+            if (transaction.getType().equals("DEPOT")) {
+                totalDeposits += transaction.getAmount();
+            } else if (transaction.getType().equals("RETRAIT")) {
+                totalWithdrawals += transaction.getAmount();
+            }
+            numberOfTransactions++;
+        }
+        stats.put("number Of Transactions", numberOfTransactions);
+        stats.put("total Deposits", totalDeposits);
+        stats.put("total Withdrawals", totalWithdrawals);
+        for (Account account : atmManager.getAllAccounts()) {
+            if (account.getAccountNumber().equals(accountNumber)) {
+                stats.put("currentBalance", account.getBalance());
+                return ResponseEntity.ok(stats);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
 

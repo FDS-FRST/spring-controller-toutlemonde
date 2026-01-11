@@ -20,6 +20,7 @@ public class AtmManager {
         accounts.put("123456", new Account("123456", "Jean Dupont", 1000.0, "1234"));
         accounts.put("789012", new Account("789012", "Marie Martin", 2500.0, "5678"));
         accounts.put("345678", new Account("345678", "Pierre Durand", 500.0, "9012"));
+        accounts.put("654321", new Account("654321", "Calvert Wanguy", 25500.0, "5678"));
     }
 
     /**

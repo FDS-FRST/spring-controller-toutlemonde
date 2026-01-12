@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +30,14 @@ public class WhitchyAtmController {
      */
     public WhitchyAtmController(AtmManager atmManager) {
         this.atmManager = atmManager;
+    }
+
+    /**
+     * Page d'acceuil : Ajout Perso
+     */
+    @GetMapping
+    public String home() {
+        return "Welcome to Whitchy ATM API!";
     }
 
     /**
@@ -82,9 +92,19 @@ public class WhitchyAtmController {
      * TODO : Ajouter @GetMapping("/accounts/{accountNumber}/balance")
      * TODO : Retourner un Map avec accountNumber et balance
      */
-    public ResponseEntity<Map<String, Object>> getBalance(String accountNumber) {
-        // TODO : Implémenter cette méthode
-        return null;
+    @GetMapping("/accounts/{accountNumber}/balance")
+    public ResponseEntity<Map<String, Object>> getBalance(@PathVariable String accountNumber) {
+        for  (Account account : atmManager.getAllAccounts()) {
+            if (account.getAccountNumber().equals(accountNumber)) {
+                double balance = atmManager.getBalance(accountNumber);
+                Map<String, Object> result = Map.of(
+                        "accountNumber", accountNumber,
+                        "balance", balance
+                );
+                return ResponseEntity.ok(result);
+            }
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     /**
@@ -94,11 +114,18 @@ public class WhitchyAtmController {
      * TODO : Recevoir le PIN dans le body (Map<String, String>)
      * TODO : Retourner un Map avec "valid" : true/false
      */
+    @PostMapping("/accounts/{accountNumber}/verify-pin")
     public ResponseEntity<Map<String, Boolean>> verifyPin(
-            String accountNumber,
-            Map<String, String> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, String> request) {
+        try {
+            String pin = request.get("pin");
+            boolean isValid = atmManager.verifyPin(accountNumber, pin);
+            Map<String, Boolean> result = Map.of("valid", isValid);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -109,11 +136,17 @@ public class WhitchyAtmController {
      * TODO : Extraire "amount" de la Map
      * TODO : Gérer les erreurs (compte inexistant, montant invalide)
      */
+    @PostMapping("/accounts/{accountNumber}/deposit")
     public ResponseEntity<Account> deposit(
-            String accountNumber,
-            Map<String, Double> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, Double> request) {
+        try {
+            double amount = request.get("amount");
+            Account updatedAccount = atmManager.deposit(accountNumber, amount);
+            return ResponseEntity.ok(updatedAccount);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -123,11 +156,17 @@ public class WhitchyAtmController {
      * TODO : Similaire au dépôt, mais avec withdraw()
      * TODO : Gérer le cas de solde insuffisant
      */
+    @PostMapping("/accounts/{accountNumber}/withdraw")
     public ResponseEntity<Account> withdraw(
-            String accountNumber,
-            Map<String, Double> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, Double> request) {
+        try {
+            double amount = request.get("amount");
+            Account updatedAccount = atmManager.withdraw(accountNumber, amount);
+            return ResponseEntity.ok(updatedAccount);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -138,9 +177,20 @@ public class WhitchyAtmController {
      * TODO : Convertir amount en double : ((Number) request.get("amount")).doubleValue()
      * TODO : Retourner un message de succès ou d'erreur
      */
-    public ResponseEntity<Map<String, String>> transfer(Map<String, Object> request) {
-        // TODO : Implémenter cette méthode
-        return null;
+    @PostMapping("/transfer")
+    public ResponseEntity<Map<String, String>> transfer(@RequestBody Map<String, Object> request) {
+        try {
+            String fromAccount = (String) request.get("from");
+            String toAccount = (String) request.get("to");
+            double amount = ((Number) request.get("amount")).doubleValue();
+
+            atmManager.transfer(fromAccount, toAccount, amount);
+            Map<String, String> result = Map.of("message", "Transfer successful");
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            Map<String, String> error = Map.of("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
     /**
@@ -149,9 +199,14 @@ public class WhitchyAtmController {
      * TODO : Ajouter @GetMapping("/accounts/{accountNumber}/transactions")
      * TODO : Retourner la liste des transactions
      */
-    public ResponseEntity<List<Transaction>> getTransactions(String accountNumber) {
-        // TODO : Implémenter cette méthode
-        return null;
+    @GetMapping("/accounts/{accountNumber}/transactions")
+    public ResponseEntity<List<Transaction>> getTransactions(@PathVariable String accountNumber) {
+        try {
+            List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+            return ResponseEntity.ok(transactions);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
@@ -160,9 +215,13 @@ public class WhitchyAtmController {
      * TODO : Ajouter @GetMapping("/transactions")
      * TODO : Retourner toutes les transactions du système
      */
+    @GetMapping("/transactions")
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        // TODO : Implémenter cette méthode
-        return null;
+        try {
+            return ResponseEntity.ok(atmManager.getAllTransactions());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // ============================================
@@ -177,6 +236,15 @@ public class WhitchyAtmController {
      * - Retourne 200 si succès, 404 si compte inexistant
      * - Note : Vous devrez d'abord ajouter la méthode deleteAccount() dans AtmManager
      */
+    @DeleteMapping("/accounts/{accountNumber}")
+    public ResponseEntity<Map<String, String>> deleteAccount(@PathVariable String accountNumber) {
+        try {
+            atmManager.deleteAccount(accountNumber);
+            return ResponseEntity.ok().body(Map.of("message", "Account deleted"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     /**
      * EXERCICE 2 : Ajouter un endpoint PUT
@@ -186,6 +254,26 @@ public class WhitchyAtmController {
      * - Body : { "oldPin": "1234", "newPin": "5678" }
      * - Vérifier l'ancien PIN avant de changer
      */
+    @PutMapping("/accounts/{accountNumber}/pin")
+    public ResponseEntity<Map<String, String>> updatePin(
+            @PathVariable String accountNumber,
+            @RequestBody Map<String, String> request) {
+        try {
+            for (Account account : atmManager.getAllAccounts()){
+                if (account.getAccountNumber().equals(accountNumber)) {
+                    if (account.getPin().equals(request.get("oldPin"))) {
+                        account.setPin(request.get("newPin"));
+                        return ResponseEntity.ok().body(Map.of("message", "Account updated : pin modifié"));
+                    }else {
+                        return ResponseEntity.badRequest().build();
+                    }
+                }
+            }
+            return ResponseEntity.badRequest().build();
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     /**
      * EXERCICE 3 : Filtrer les transactions
@@ -194,6 +282,25 @@ public class WhitchyAtmController {
      * - Retourne uniquement les dépôts
      * - Filtrer les transactions où type = "DEPOT"
      */
+    @GetMapping("/accounts/{accountNumber}/transactions/deposits")
+    public ResponseEntity<List<Transaction>> getTransactionsDeposits(@PathVariable String accountNumber) {
+        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        List<Transaction> depositTransactions = new ArrayList<>();
+        boolean found = false;
+        for (Transaction transaction : transactions) {
+            if (transaction.getAccountNumber().equals(accountNumber)){
+                found = true;
+                if (transaction.getType().equals("DEPOT")) {
+                    depositTransactions.add(transaction);
+                }
+            }
+        }
+        if (found) {
+            return ResponseEntity.ok(depositTransactions);
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     /**
      * EXERCICE 4 : Statistiques de compte
@@ -202,5 +309,31 @@ public class WhitchyAtmController {
      * - Retourne : nombre de transactions, total dépôts, total retraits, solde actuel
      * - Format : Map<String, Object>
      */
+    @GetMapping("/accounts/{accountNumber}/stats")
+    public ResponseEntity<Map<String, Object>> getAccountStats(@PathVariable String accountNumber) {
+        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        int numberOfTransactions = 0;
+        double totalDeposits = 0.0;
+        double totalWithdrawals = 0.0;
+        Map<String, Object> stats = new HashMap<>();
+        for (Transaction transaction : transactions) {
+            if (transaction.getType().equals("DEPOT")) {
+                totalDeposits += transaction.getAmount();
+            } else if (transaction.getType().equals("RETRAIT")) {
+                totalWithdrawals += transaction.getAmount();
+            }
+            numberOfTransactions++;
+        }
+        stats.put("number Of Transactions", numberOfTransactions);
+        stats.put("total Deposits", totalDeposits);
+        stats.put("total Withdrawals", totalWithdrawals);
+        for (Account account : atmManager.getAllAccounts()) {
+            if (account.getAccountNumber().equals(accountNumber)) {
+                stats.put("currentBalance", account.getBalance());
+                return ResponseEntity.ok(stats);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
 

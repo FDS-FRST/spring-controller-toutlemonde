@@ -49,6 +49,16 @@ public class AtmManager {
     }
 
     /**
+     * Supprime un compte
+     */
+    public void deleteAccount(String accountNumber) {
+        if (!accounts.containsKey(accountNumber)) {
+            throw new IllegalArgumentException("Account does not exist");
+        }
+        accounts.remove(accountNumber);
+    }
+
+    /**
      * Vérifie le PIN d'un compte
      */
     public boolean verifyPin(String accountNumber, String pin) {

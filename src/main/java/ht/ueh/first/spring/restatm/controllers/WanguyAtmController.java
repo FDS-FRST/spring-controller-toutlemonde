@@ -1,8 +1,8 @@
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
+import ht.ueh.first.spring.restatm.services.AtmService;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +18,13 @@ import java.util.Map;
 @RequestMapping("/api/atm")
 public class WanguyAtmController {
 
-    private final AtmManager atmManager;
+    private final AtmService atmService;
 
     /**
      * Injection de dépendance via le constructeur
      */
-    public WanguyAtmController(AtmManager atmManager) {
-        this.atmManager = atmManager;
+    public WanguyAtmController(AtmService atmService) {
+        this.atmService = atmService;
     }
 
     /**
@@ -32,7 +32,7 @@ public class WanguyAtmController {
      */
     @GetMapping("/accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
-        return ResponseEntity.ok(atmManager.getAllAccounts());
+        return ResponseEntity.ok(atmService.getAllAccounts());
     }
 
     /**
@@ -40,7 +40,7 @@ public class WanguyAtmController {
      */
     @GetMapping("/accounts/{accountNumber}")
     public ResponseEntity<Account> getAccount(@PathVariable String accountNumber) {
-        Account account = atmManager.getAccount(accountNumber);
+        Account account = atmService.getAccount(accountNumber);
         if (account == null) {
             return ResponseEntity.notFound().build();
         }
@@ -53,7 +53,7 @@ public class WanguyAtmController {
     @PostMapping("/accounts")
     public ResponseEntity<Account> createAccount(@RequestBody Account account) {
         try {
-            Account createdAccount = atmManager.createAccount(account);
+            Account createdAccount = atmService.createAccount(account);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -65,7 +65,7 @@ public class WanguyAtmController {
      */
     @GetMapping("/accounts/{accountNumber}/balance")
     public ResponseEntity<Map<String, Object>> getBalance(@PathVariable String accountNumber) {
-        Account account = atmManager.getAccount(accountNumber);
+        Account account = atmService.getAccount(accountNumber);
         if (account == null) {
             return ResponseEntity.notFound().build();
         }
@@ -86,7 +86,7 @@ public class WanguyAtmController {
             @RequestBody Map<String, String> request) {
 
         String pin = request.get("pin");
-        boolean valid = atmManager.verifyPin(accountNumber, pin);
+        boolean valid = atmService.verifyPin(accountNumber, pin);
 
         Map<String, Boolean> response = new HashMap<>();
         response.put("valid", valid);
@@ -108,7 +108,7 @@ public class WanguyAtmController {
         }
 
         try {
-            Account account = atmManager.deposit(accountNumber, amount);
+            Account account = atmService.deposit(accountNumber, amount);
             return ResponseEntity.ok(account);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -129,7 +129,7 @@ public class WanguyAtmController {
         }
 
         try {
-            Account account = atmManager.withdraw(accountNumber, amount);
+            Account account = atmService.withdraw(accountNumber, amount);
             return ResponseEntity.ok(account);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -152,7 +152,7 @@ public class WanguyAtmController {
         Map<String, String> response = new HashMap<>();
 
         try {
-            atmManager.transfer(from, to, amount);
+            atmService.transfer(from, to, amount);
             response.put("message", "Virement effectué avec succès");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class WanguyAtmController {
     public ResponseEntity<List<Transaction>> getTransactions(
             @PathVariable String accountNumber) {
 
-        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        List<Transaction> transactions = atmService.getTransactions(accountNumber);
         if (transactions == null) {
             return ResponseEntity.notFound().build();
         }
@@ -180,7 +180,7 @@ public class WanguyAtmController {
      */
     @GetMapping("/transactions")
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        return ResponseEntity.ok(atmManager.getAllTransactions());
+        return ResponseEntity.ok(atmService.getAllTransactions());
     }
 }
 

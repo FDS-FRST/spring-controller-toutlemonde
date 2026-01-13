@@ -1,11 +1,10 @@
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
+import ht.ueh.first.spring.restatm.services.AtmService;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,14 +20,14 @@ import java.util.Map;
 @RequestMapping("/api/chardy")
 public class ChardyController {
 
-    private final AtmManager atmManager;
+    private final AtmService atmService;
 
     /**
      * Constructeur pour l'injection de dépendances
      * Spring injectera automatiquement l'instance d'AtmManager
      */
-    public ChardyController(AtmManager atmManager) {
-        this.atmManager = atmManager;
+    public ChardyController(AtmService atmService) {
+        this.atmService = atmService;
     }
 
     /**
@@ -39,7 +38,7 @@ public class ChardyController {
 
     public ResponseEntity<List<Account>> getAllAccounts() {
 
-        return ResponseEntity.ok().body(atmManager.getAllAccounts());
+        return ResponseEntity.ok().body(atmService.getAllAccounts());
     }
 
     /**

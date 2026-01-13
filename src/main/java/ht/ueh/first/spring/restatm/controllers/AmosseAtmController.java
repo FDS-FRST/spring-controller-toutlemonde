@@ -1,8 +1,8 @@
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
+import ht.ueh.first.spring.restatm.services.AtmService;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,20 +19,20 @@ import java.util.Map;
 public class AmosseAtmController {
     @Value("frst.haiti.name")
     String haiti;
-    private final AtmManager atmManager;
+    private final AtmService atmService;
 
-    public AmosseAtmController(AtmManager atmManager) {
-        this.atmManager = atmManager;
+    public AmosseAtmController(AtmService atmService) {
+        this.atmService = atmService;
     }
 
     @GetMapping()
     public ResponseEntity<List<Account>> getAllAccounts() {
-        return ResponseEntity.ok().body(atmManager.getAllAccounts());
+        return ResponseEntity.ok().body(atmService.getAllAccounts());
     }
 
     @PostMapping()
     public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        atmManager.createAccount(account);
+        atmService.createAccount(account);
         return ResponseEntity.ok(account);
     }
 

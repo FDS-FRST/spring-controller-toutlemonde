@@ -1,9 +1,8 @@
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
-import org.springframework.http.HttpStatus;
+import ht.ueh.first.spring.restatm.services.AtmService;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,15 +19,15 @@ import java.util.Map;
 @RequestMapping("/api/Delvatm")
 public class DelvaAtmController {
 
-    private final AtmManager atmManager;
+    private final AtmService atmService;
 
     /**
      * Constructeur pour l'injection de dépendances
      * Spring injectera automatiquement l'instance d'AtmManager
      */
 
-    public DelvaAtmController (AtmManager atmManager) {
-        this.atmManager = atmManager;
+    public DelvaAtmController (AtmService atmService) {
+        this.atmService = atmService;
     }
 
     /**
@@ -40,7 +39,7 @@ public class DelvaAtmController {
     @GetMapping("/accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
         // TODO : Implémenter cette méthode
-        return ResponseEntity.ok().body(atmManager.getAllAccounts());
+        return ResponseEntity.ok().body(atmService.getAllAccounts());
     }
 
     /**

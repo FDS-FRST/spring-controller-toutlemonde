@@ -1,8 +1,8 @@
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
+import ht.ueh.first.spring.restatm.services.AtmService;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,14 +30,14 @@ import java.util.List;
 public class OdaAtmController {
 
 
-    private final AtmManager atmManager;
+    private final AtmService atmService;
 
     /**
      * Constructeur pour l'injection de dépendances
      * Spring injectera automatiquement l'instance d'AtmManager
      */
-    public OdaAtmController(AtmManager atmManager) {
-        this.atmManager = atmManager;
+    public OdaAtmController(AtmService atmService) {
+        this.atmService = atmService;
     }
 
     @GetMapping("/")
@@ -55,7 +55,7 @@ public class OdaAtmController {
     @GetMapping("/accounts")
 
     public ResponseEntity<List<Account>> getAllAccounts() {
-        List<Account> accounts = atmManager.getAllAccounts();
+        List<Account> accounts = atmService.getAllAccounts();
         // TODO : Implémenter cette méthode
         return ResponseEntity.ok(accounts);
     }
@@ -70,7 +70,7 @@ public class OdaAtmController {
     @GetMapping("/accounts/{accountNumber}")
     public ResponseEntity<Account> getAccount(
             @PathVariable String accountNumber) {
-        Account account = atmManager.getAccount(accountNumber);
+        Account account = atmService.getAccount(accountNumber);
         if (account == null) {
             return ResponseEntity.notFound().build(); // 404
         }
@@ -91,7 +91,7 @@ public class OdaAtmController {
     public ResponseEntity<Account> createAccount(@RequestBody Account account) {
         // TODO : Implémenter cette méthode avec try-catch
         try {
-            Account createdAccount = atmManager.createAccount(account);
+            Account createdAccount = atmService.createAccount(account);
             return ResponseEntity.status(201).body(createdAccount); // 201 Created
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build(); // 400
@@ -107,7 +107,7 @@ public class OdaAtmController {
     @GetMapping("/accounts/{accountNumber}/balance")
     public ResponseEntity<Map<String, Object>> getBalance(@PathVariable String accountNumber) {
         try {
-            double balance = atmManager.getBalance(accountNumber);
+            double balance = atmService.getBalance(accountNumber);
 
             Map<String, Object> response = new HashMap<>();
             response.put("accountNumber", accountNumber);
@@ -143,7 +143,7 @@ public class OdaAtmController {
         }
 
         // Verify PIN ak AtmManager
-        boolean isValid = atmManager.verifyPin(accountNumber, pin);
+        boolean isValid = atmService.verifyPin(accountNumber, pin);
 
         response.put("valid", isValid);
         return ResponseEntity.ok(response); // 200 OK
@@ -171,7 +171,7 @@ public class OdaAtmController {
         double amount = request.get("amount");
 
         try {
-            Account updatedAccount = atmManager.deposit(accountNumber, amount);
+            Account updatedAccount = atmService.deposit(accountNumber, amount);
             return ResponseEntity.ok(updatedAccount); // 200 OK
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build(); // 400 si erè (eg. kont pa egziste, montant negatif)
@@ -197,7 +197,7 @@ public class OdaAtmController {
         double amount = request.get("amount");
 
         // Si kont pa egziste oswa balans < amount, AtmManager ap lanse IllegalArgumentException
-        Account updatedAccount = atmManager.withdraw(accountNumber, amount);
+        Account updatedAccount = atmService.withdraw(accountNumber, amount);
 
         return ResponseEntity.ok(updatedAccount); // 200 OK si tout mache
     }
@@ -221,7 +221,7 @@ public class OdaAtmController {
             String to = (String) request.get("to");
             double amount = ((Number) request.get("amount")).doubleValue();
 
-            atmManager.transfer(from, to, amount);
+            atmService.transfer(from, to, amount);
 
             response.put("message", "Transfer successful");
             return ResponseEntity.ok(response); // 200 OK
@@ -244,7 +244,7 @@ public class OdaAtmController {
     public ResponseEntity<List<Transaction>> getTransactions(
             @PathVariable String accountNumber) {
 
-        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        List<Transaction> transactions = atmService.getTransactions(accountNumber);
 
         return ResponseEntity.ok(transactions); // 200 OK
     }
@@ -257,7 +257,7 @@ public class OdaAtmController {
      */
     @GetMapping("/transactions")
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> allTransactions = atmManager.getAllTransactions();
+        List<Transaction> allTransactions = atmService.getAllTransactions();
         // TODO : Implémenter cette méthode
         return ResponseEntity.ok(allTransactions);
     }
@@ -277,7 +277,7 @@ public class OdaAtmController {
     @DeleteMapping("/accounts/{accountNumber}")
     public ResponseEntity<String> deleteAccount(@PathVariable String accountNumber) {
         try {
-            atmManager.deleteAccount(accountNumber);
+            atmService.deleteAccount(accountNumber);
             return ResponseEntity.ok("Account deleted successfully"); // 200 OK
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body("Account not found"); // 404 Not Found
@@ -309,13 +309,13 @@ public class OdaAtmController {
         }
 
         // Verify si PIN aktyèl la kòrèk
-        if (!atmManager.verifyPin(accountNumber, oldPin)) {
+        if (!atmService.verifyPin(accountNumber, oldPin)) {
             response.put("error", "Old PIN is incorrect");
             return ResponseEntity.status(403).body(response); // 403 Forbidden
         }
 
         // Chanje PIN nan kont lan
-        atmManager.updatePin(accountNumber, newPin); // Fè metòd sa nan AtmManager
+        atmService.updatePin(accountNumber, newPin); // Fè metòd sa nan AtmManager
 
         response.put("message", "PIN updated successfully");
         return ResponseEntity.ok(response); // 200 OK
@@ -332,7 +332,7 @@ public class OdaAtmController {
     @GetMapping("/accounts/{accountNumber}/transactions/deposits")
     public ResponseEntity<List<Transaction>> getDeposits(@PathVariable String accountNumber) {
         // Ranmase tout tranzaksyon pou kont lan
-        List<Transaction> allTransactions = atmManager.getTransactions(accountNumber);
+        List<Transaction> allTransactions = atmService.getTransactions(accountNumber);
 
         // Filtre pou kenbe sèlman tranzaksyon ki se "DEPOT"
         List<Transaction> deposits = allTransactions.stream()

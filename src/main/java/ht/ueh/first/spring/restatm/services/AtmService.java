@@ -1,42 +1,34 @@
-package ht.ueh.first.spring.restatm.manager;
+package ht.ueh.first.spring.restatm.services;
 
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
-import org.springframework.stereotype.Component;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
+import ht.ueh.first.spring.restatm.repositories.AtmRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
-public class AtmManager {
+@Service
+public class AtmService {
 
-    private final Map<String, Account> accounts = new ConcurrentHashMap<>();
-    private final List<Transaction> transactions = Collections.synchronizedList(new ArrayList<>());
-    private final AtomicInteger transactionCounter = new AtomicInteger(1);
+    private AtmRepository atmRepository;
 
-    public AtmManager() {
-        // Initialisation avec quelques comptes de test
-        accounts.put("123456", new Account("123456", "Jean Dupont", 1000.0, "1234"));
-        accounts.put("789012", new Account("789012", "Marie Martin", 2500.0, "5678"));
-        accounts.put("345678", new Account("345678", "Pierre Durand", 500.0, "9012"));
-        accounts.put("654321", new Account("654321", "Calvert Wanguy", 25500.0, "5678"));
+    public AtmService(AtmRepository atmRepository) {
+        this.atmRepository = atmRepository;
     }
 
-
-
     /**
-     * Récupère tous les comptes*/
+     * Récupère tous les comptes
+     */
 
     public List<Account> getAllAccounts() {
-        return new ArrayList<>(accounts.values());
+        return new ArrayList<>(atmRepository.getAccounts().values());
     }
 
     /**
      * Récupère un compte par son numéro
      */
     public Account getAccount(String accountNumber) {
-        return accounts.get(accountNumber);
+        return atmRepository.getAccounts().get(accountNumber);
     }
 
 
@@ -44,10 +36,10 @@ public class AtmManager {
      * Crée un nouveau compte
      */
     public Account createAccount(Account account) {
-        if (accounts.containsKey(account.getAccountNumber())) {
+        if (atmRepository.getAccounts().containsKey(account.getAccountNumber())) {
             throw new IllegalArgumentException("Account already exists");
         }
-        accounts.put(account.getAccountNumber(), account);
+        atmRepository.getAccounts().put(account.getAccountNumber(), account);
         return account;
     }
 
@@ -55,17 +47,17 @@ public class AtmManager {
      * Supprime un compte
      */
     public void deleteAccount(String accountNumber) {
-        if (!accounts.containsKey(accountNumber)) {
+        if (!atmRepository.getAccounts().containsKey(accountNumber)) {
             throw new IllegalArgumentException("Account does not exist");
         }
-        accounts.remove(accountNumber);
+        atmRepository.getAccounts().remove(accountNumber);
     }
 
     /**
      * Vérifie le PIN d'un compte
      */
     public boolean verifyPin(String accountNumber, String pin) {
-        Account account = accounts.get(accountNumber);
+        Account account = atmRepository.getAccounts().get(accountNumber);
         if (account == null) {
             return false;
         }
@@ -76,7 +68,7 @@ public class AtmManager {
      * Consulte le solde d'un compte
      */
     public double getBalance(String accountNumber) {
-        Account account = accounts.get(accountNumber);
+        Account account = atmRepository.getAccounts().get(accountNumber);
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
         }
@@ -91,7 +83,7 @@ public class AtmManager {
             throw new IllegalArgumentException("Amount must be positive");
         }
 
-        Account account = accounts.get(accountNumber);
+        Account account = atmRepository.getAccounts().get(accountNumber);
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
         }
@@ -109,7 +101,7 @@ public class AtmManager {
             throw new IllegalArgumentException("Amount must be positive");
         }
 
-        Account account = accounts.get(accountNumber);
+        Account account = atmRepository.getAccounts().get(accountNumber);
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
         }
@@ -131,8 +123,8 @@ public class AtmManager {
             throw new IllegalArgumentException("Amount must be positive");
         }
 
-        Account from = accounts.get(fromAccount);
-        Account to = accounts.get(toAccount);
+        Account from = atmRepository.getAccounts().get(fromAccount);
+        Account to = atmRepository.getAccounts().get(toAccount);
 
         if (from == null || to == null) {
             throw new IllegalArgumentException("Account not found");
@@ -154,7 +146,7 @@ public class AtmManager {
      */
     public List<Transaction> getTransactions(String accountNumber) {
         List<Transaction> result = new ArrayList<>();
-        for (Transaction t : transactions) {
+        for (Transaction t : atmRepository.getTransactions()) {
             if (t.getAccountNumber().equals(accountNumber)) {
                 result.add(t);
             }
@@ -166,7 +158,7 @@ public class AtmManager {
      * Récupère toutes les transactions
      */
     public List<Transaction> getAllTransactions() {
-        return new ArrayList<>(transactions);
+        return new ArrayList<>(atmRepository.getTransactions());
     }
 
     /**
@@ -174,31 +166,25 @@ public class AtmManager {
      */
     private void addTransaction(String accountNumber, String type, double amount, double balanceAfter) {
         Transaction transaction = new Transaction(
-                String.valueOf(transactionCounter.getAndIncrement()),
+                String.valueOf(atmRepository.getTransactionCounter().getAndIncrement()),
                 accountNumber,
                 type,
                 amount,
                 balanceAfter
         );
-        transactions.add(transaction);
+        atmRepository.getTransactions().add(transaction);
     }
 
     /**
      * Supprime un compte par son numéro
      */
-//    public boolean deleteAccount(String accountNumber) {
-//        Account removed = accounts.remove(accountNumber);
-//        return removed != null; // true si kont la te egziste epi li efase, false sinon
-//    }
-
     public void updatePin(String accountNumber, String newPin) {
-        Account account = accounts.get(accountNumber);
+        Account account = atmRepository.getAccounts().get(accountNumber);
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
         }
         account.setPin(newPin);
     }
-
 
 
 }

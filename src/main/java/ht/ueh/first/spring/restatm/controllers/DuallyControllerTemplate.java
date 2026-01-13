@@ -1,8 +1,8 @@
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
+import ht.ueh.first.spring.restatm.services.AtmService;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,20 +17,20 @@ import java.util.Map;
 
 public class DuallyControllerTemplate {
 
-    private final AtmManager atmManager;
+    private final AtmService atmService;
 
     /**
      * Constructeur pour l'injection de dépendances
      * Spring injectera automatiquement l'instance d'AtmManager
      */
 
-    public DuallyControllerTemplate(AtmManager atmManager) {
-        this.atmManager = atmManager;
+    public DuallyControllerTemplate(AtmService atmService) {
+        this.atmService = atmService;
     }
 
     @GetMapping("/accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
-        return ResponseEntity.ok(atmManager.getAllAccounts());
+        return ResponseEntity.ok(atmService.getAllAccounts());
     }
 
     @GetMapping("/accounts/{accountNumber}")
@@ -38,13 +38,13 @@ public class DuallyControllerTemplate {
         if (accountNumber == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(atmManager.getAccount(accountNumber));
+        return ResponseEntity.ok(atmService.getAccount(accountNumber));
     }
 
     @PostMapping("/accounts")
     public ResponseEntity<Account> createAccount(@RequestBody Account account) {
         try {
-            Account createdAccount = atmManager.createAccount(account);
+            Account createdAccount = atmService.createAccount(account);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
         }
         catch (IllegalArgumentException e) {
@@ -56,7 +56,7 @@ public class DuallyControllerTemplate {
 
     @GetMapping("/accounts/{accountNumber}/balance")
     public ResponseEntity<Map<String, Object>> getBalance(@PathVariable String accountNumber) {
-        Account account = atmManager.getAccount(accountNumber);
+        Account account = atmService.getAccount(accountNumber);
         if (account == null) {
             return ResponseEntity.notFound().build();
         }
@@ -75,13 +75,13 @@ public class DuallyControllerTemplate {
             @PathVariable String accountNumber,
             @RequestBody Map<String, String> request) {
 
-        Account account = atmManager.getAccount(accountNumber);
+        Account account = atmService.getAccount(accountNumber);
         if (account == null) {
             return ResponseEntity.notFound().build();
         }
 
         String pin = request.get("pin");
-        boolean isValid = atmManager.verifyPin(accountNumber, pin);
+        boolean isValid = atmService.verifyPin(accountNumber, pin);
 
         Map<String, Boolean> response = new HashMap<>();
         response.put("valid", isValid);
@@ -94,7 +94,7 @@ public class DuallyControllerTemplate {
     public ResponseEntity<Account> deposit(@PathVariable String accountNumber, @RequestBody Map<String, Double> request) {
         try {
             double amount = request.get("amount");
-            Account account = atmManager.deposit(accountNumber, amount);
+            Account account = atmService.deposit(accountNumber, amount);
             if (account == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -114,7 +114,7 @@ public class DuallyControllerTemplate {
             @RequestBody Map<String, Double> request) {
         try {
             double amount = request.get("amount");
-            Account account = atmManager.withdraw(accountNumber, amount);
+            Account account = atmService.withdraw(accountNumber, amount);
             if (account == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -133,7 +133,7 @@ public class DuallyControllerTemplate {
             String To = (String) request.get("to");
             double amount = ((Number) request.get("amount")).doubleValue();
 
-            atmManager.transfer(From, To, amount);
+            atmService.transfer(From, To, amount);
             return ResponseEntity.ok(Map.of("message", "Transfer successful"));
         }
         catch (IllegalArgumentException e) {
@@ -145,7 +145,7 @@ public class DuallyControllerTemplate {
 
     @GetMapping("/accounts/{accountNumber}/transactions")
     public ResponseEntity<List<Transaction>> getTransactions(@PathVariable String accountNumber) {
-        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        List<Transaction> transactions = atmService.getTransactions(accountNumber);
         return ResponseEntity.ok(transactions);
     }
 
@@ -153,7 +153,7 @@ public class DuallyControllerTemplate {
 
     @GetMapping("/transactions")
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = atmManager.getAllTransactions();
+        List<Transaction> transactions = atmService.getAllTransactions();
         return ResponseEntity.ok(transactions);
     }
 
@@ -165,7 +165,7 @@ public class DuallyControllerTemplate {
 
      @DeleteMapping("/accounts/{accountNumber}")
      public ResponseEntity<Void> deleteAccount(@PathVariable String accountNumber) {
-     Account account = atmManager.getAccount(accountNumber);
+     Account account = atmService.getAccount(accountNumber);
          if (account == null) {
             return ResponseEntity.notFound().build();
          }

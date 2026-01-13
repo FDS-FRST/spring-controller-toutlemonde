@@ -1,15 +1,15 @@
-package ht.ueh.first.spring.restatm.models;
+package ht.ueh.first.spring.restatm.models.accounts;
 
-public class Oda {
+public class Account {
     private String accountNumber;
     private String owner;
     private double balance;
     private String pin;
 
-    public Oda() {
+    public Account() {
     }
 
-    public Oda(String accountNumber, String owner, double balance, String pin) {
+    public Account(String accountNumber, String owner, double balance, String pin) {
         this.accountNumber = accountNumber;
         this.owner = owner;
         this.balance = balance;

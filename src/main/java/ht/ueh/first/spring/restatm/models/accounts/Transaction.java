@@ -1,4 +1,4 @@
-package ht.ueh.first.spring.restatm.models;
+package ht.ueh.first.spring.restatm.models.accounts;
 
 import java.time.LocalDateTime;
 

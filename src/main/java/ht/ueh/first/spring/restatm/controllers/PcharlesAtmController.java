@@ -1,8 +1,8 @@
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
+import ht.ueh.first.spring.restatm.services.AtmService;
+import ht.ueh.first.spring.restatm.models.accounts.Account;
+import ht.ueh.first.spring.restatm.models.accounts.Transaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +21,14 @@ import java.util.Map;
 @RequestMapping("/api/pcharlesatm")
 public class PcharlesAtmController {
 
-    private final AtmManager atmManager;
+    private final AtmService atmService;
 
     /**
      * Constructeur pour l'injection de dépendances
      * Spring injectera automatiquement l'instance d'AtmManager
      */
-    public PcharlesAtmController(AtmManager atmManager) {
-        this.atmManager = atmManager;
+    public PcharlesAtmController(AtmService atmService) {
+        this.atmService = atmService;
     }
 
     /**
@@ -40,7 +40,7 @@ public class PcharlesAtmController {
     @GetMapping("/accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
         // TODO : Implémenter cette méthode
-        return new ResponseEntity<>(atmManager.getAllAccounts(), HttpStatus.OK);
+        return new ResponseEntity<>(atmService.getAllAccounts(), HttpStatus.OK);
     }
 
     /**
@@ -53,7 +53,7 @@ public class PcharlesAtmController {
     @GetMapping("/accounts/{accountNumber}")
     public ResponseEntity<Account> getAccount(@PathVariable String accountNumber) {
         // TODO : Implémenter cette méthode
-        Account account = atmManager.getAccount(accountNumber);
+        Account account = atmService.getAccount(accountNumber);
         if(account == null) {
             return ResponseEntity.notFound().build();
         }
@@ -72,7 +72,7 @@ public class PcharlesAtmController {
     public ResponseEntity<Account> createAccount(@RequestBody Account account) {
         // TODO : Implémenter cette méthode avec try-catch
         try {
-            Account accountCreated = atmManager.createAccount(account);
+            Account accountCreated = atmService.createAccount(account);
             return ResponseEntity.status(HttpStatus.CREATED).body(accountCreated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -94,7 +94,7 @@ public class PcharlesAtmController {
         // TODO : Implémenter cette méthode
         try {
             // Appelle le manager pour récupérer le solde du compte spécifié
-            double balance = atmManager.getBalance(accountNumber);
+            double balance = atmService.getBalance(accountNumber);
 
             // Crée une Map pour construire la réponse JSON
             Map<String, Object> response = new HashMap<>();
@@ -135,7 +135,7 @@ public class PcharlesAtmController {
         // 1. Récupérer le PIN envoyé par le client
         String pin = request.get("pin");
         // 2. Vérifier le PIN via le manager
-        boolean valid = atmManager.verifyPin(accountNumber, pin);
+        boolean valid = atmService.verifyPin(accountNumber, pin);
         // 3. Préparer la réponse JSON
         Map<String, Boolean> response = new HashMap<>();
         response.put("valid", valid);
@@ -162,7 +162,7 @@ public class PcharlesAtmController {
             double amount = request.get("amount");
             // 2. Effectuer le dépôt via le manager
             //    Met à jour le solde du compte et enregistre la transaction
-            Account account = atmManager.deposit(accountNumber, amount);
+            Account account = atmService.deposit(accountNumber, amount);
             // 3. Retourner le compte mis à jour avec HTTP 200 OK
             return ResponseEntity.ok(account);
 
@@ -202,7 +202,7 @@ public class PcharlesAtmController {
 
             // Effectuer le retrait via le manager
             // Vérifie le solde, met à jour le compte et enregistre la transaction
-            Account account = atmManager.withdraw(accountNumber, amount);
+            Account account = atmService.withdraw(accountNumber, amount);
 
             // Retourner le compte mis à jour avec HTTP 200 OK
             return ResponseEntity.ok(account);
@@ -240,7 +240,7 @@ public class PcharlesAtmController {
 
             // Effectuer le virement via le manager
             // Vérifie le solde, met à jour les deux comptes et enregistre les transactions
-            atmManager.transfer(from, to, amount);
+            atmService.transfer(from, to, amount);
 
             // Préparer la réponse JSON avec un message de succès
             Map<String, String> response = new HashMap<>();
@@ -274,7 +274,7 @@ public class PcharlesAtmController {
     public ResponseEntity<List<Transaction>> getTransactions(@PathVariable String accountNumber) {
 
         // Récupérer toutes les transactions liées au compte via le manager
-        List<Transaction> transactions = atmManager.getTransactions(accountNumber);
+        List<Transaction> transactions = atmService.getTransactions(accountNumber);
 
         // Retourner la liste des transactions (vide si aucune transaction)
         return ResponseEntity.ok(transactions);
@@ -290,7 +290,7 @@ public class PcharlesAtmController {
     public ResponseEntity<List<Transaction>> getAllTransactions() {
 
         // Récupérer toutes les transactions du système via le manager
-        List<Transaction> transactions = atmManager.getAllTransactions();
+        List<Transaction> transactions = atmService.getAllTransactions();
 
         // Retourner la liste complète des transactions
         return ResponseEntity.ok(transactions);

@@ -63,23 +63,15 @@ Vous avez deux options :
 ```java
 package ht.ueh.first.spring.restatm.controllers;
 
-import ht.ueh.first.spring.restatm.manager.AtmManager;
-import ht.ueh.first.spring.restatm.models.Account;
-import ht.ueh.first.spring.restatm.models.Transaction;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
+import ht.ueh.first.spring.restatm.services.AtmService;
 
 // TODO : Ajouter les annotations @RestController et @RequestMapping
 public class AtmController {
 
-    private final AtmManager atmManager;
+    private final AtmService atmManager;
 
     // TODO : Créer le constructeur pour injecter AtmManager
-    
+
 }
 ```
 

@@ -16,7 +16,13 @@ import java.util.Map;
  * TODO : Ajouter l'annotation @RestController
  * TODO : Ajouter l'annotation @RequestMapping avec le chemin de base "/api/atm"
  */
+
+@RestController
+@RequestMapping
+
 public class AtmControllerTemplate {
+
+
 
     private final AtmManager atmManager;
 

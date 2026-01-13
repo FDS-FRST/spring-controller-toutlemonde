@@ -22,9 +22,11 @@ public class AtmManager {
         accounts.put("345678", new Account("345678", "Pierre Durand", 500.0, "9012"));
     }
 
+
+
     /**
-     * Récupère tous les comptes
-     */
+     * Récupère tous les comptes*/
+
     public List<Account> getAllAccounts() {
         return new ArrayList<>(accounts.values());
     }
@@ -32,9 +34,10 @@ public class AtmManager {
     /**
      * Récupère un compte par son numéro
      */
-    public Account getAccount(String accountNumber) {
+    public Account getAccountByNumber(String accountNumber) {
         return accounts.get(accountNumber);
     }
+
 
     /**
      * Crée un nouveau compte
@@ -168,5 +171,28 @@ public class AtmManager {
         );
         transactions.add(transaction);
     }
+
+    /**
+     * Supprime un compte par son numéro
+     */
+    public boolean deleteAccount(String accountNumber) {
+        Account removed = accounts.remove(accountNumber);
+        return removed != null; // true si kont la te egziste epi li efase, false sinon
+    }
+
+    public void updatePin(String accountNumber, String newPin) {
+        Account account = accounts.get(accountNumber);
+        if (account == null) {
+            throw new IllegalArgumentException("Account not found");
+        }
+        account.setPin(newPin);
+    }
+
+
+
 }
+
+
+
+
 

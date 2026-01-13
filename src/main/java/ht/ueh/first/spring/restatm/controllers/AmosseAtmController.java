@@ -3,10 +3,9 @@ package ht.ueh.first.spring.restatm.controllers;
 import ht.ueh.first.spring.restatm.manager.AtmManager;
 import ht.ueh.first.spring.restatm.models.Account;
 import ht.ueh.first.spring.restatm.models.Transaction;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -16,52 +15,32 @@ import java.util.Map;
  *
  */
 @RestController
-@RequestMapping("/api/amosseatm")
+@RequestMapping("/api/accounts")
 public class AmosseAtmController {
-
+    @Value("frst.haiti.name")
+    String haiti;
     private final AtmManager atmManager;
 
-    /**
-     * Constructeur pour l'injection de dépendances
-     * Spring injectera automatiquement l'instance d'AtmManager
-     */
     public AmosseAtmController(AtmManager atmManager) {
         this.atmManager = atmManager;
     }
 
-    /**
-     * Endpoint 1 : Récupère la liste de tous les comptes
-     *
-     */
-    @GetMapping("/accounts")
+    @GetMapping()
     public ResponseEntity<List<Account>> getAllAccounts() {
         return ResponseEntity.ok().body(atmManager.getAllAccounts());
     }
 
-    /**
-     * Endpoint 2 : Récupère un compte spécifique par son numéro
-     * <p>
-     * TODO : Ajouter @GetMapping("/accounts/{accountNumber}")
-     * TODO : Ajouter @PathVariable pour extraire accountNumber
-     * TODO : Retourner 404 si le compte n'existe pas
-     */
+    @PostMapping()
+    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
+        atmManager.createAccount(account);
+        return ResponseEntity.ok(account);
+    }
+
     public ResponseEntity<Account> getAccount(String accountNumber) {
         // TODO : Implémenter cette méthode
         return null;
     }
 
-    /**
-     * Endpoint 3 : Crée un nouveau compte
-     * <p>
-     * TODO : Ajouter @PostMapping("/accounts")
-     * TODO : Ajouter @RequestBody pour recevoir le compte en JSON
-     * TODO : Retourner 201 Created en cas de succès
-     * TODO : Retourner 400 Bad Request en cas d'erreur
-     */
-    public ResponseEntity<Account> createAccount(Account account) {
-        // TODO : Implémenter cette méthode avec try-catch
-        return null;
-    }
 
     /**
      * Endpoint 4 : Consulte le solde d'un compte

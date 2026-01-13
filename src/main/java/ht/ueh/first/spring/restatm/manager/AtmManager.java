@@ -35,7 +35,7 @@ public class AtmManager {
     /**
      * Récupère un compte par son numéro
      */
-    public Account getAccountByNumber(String accountNumber) {
+    public Account getAccount(String accountNumber) {
         return accounts.get(accountNumber);
     }
 

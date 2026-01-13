@@ -186,10 +186,10 @@ public class AtmManager {
     /**
      * Supprime un compte par son numéro
      */
-    public boolean deleteAccount(String accountNumber) {
-        Account removed = accounts.remove(accountNumber);
-        return removed != null; // true si kont la te egziste epi li efase, false sinon
-    }
+//    public boolean deleteAccount(String accountNumber) {
+//        Account removed = accounts.remove(accountNumber);
+//        return removed != null; // true si kont la te egziste epi li efase, false sinon
+//    }
 
     public void updatePin(String accountNumber, String newPin) {
         Account account = accounts.get(accountNumber);

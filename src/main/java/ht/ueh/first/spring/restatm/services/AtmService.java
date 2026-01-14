@@ -12,20 +12,24 @@ public class AtmService {
 
     private AtmRepository atmRepository;
 
+    /**
+     * I
+     * @param atmRepository
+     */
     public AtmService(AtmRepository atmRepository) {
         this.atmRepository = atmRepository;
     }
 
     /**
-     * Récupère tous les comptes
+     * Retrieves all accounts
      */
-
     public List<Account> getAllAccounts() {
         return new ArrayList<>(atmRepository.getAccounts().values());
     }
 
     /**
-     * Récupère un compte par son numéro
+     * Retrieves an account
+     * @param accountNumber number of account to find
      */
     public Account getAccount(String accountNumber) {
         return atmRepository.getAccounts().get(accountNumber);
@@ -33,7 +37,7 @@ public class AtmService {
 
 
     /**
-     * Crée un nouveau compte
+     * Creates a new account
      */
     public Account createAccount(Account account) {
         if (atmRepository.getAccounts().containsKey(account.getAccountNumber())) {
@@ -44,7 +48,7 @@ public class AtmService {
     }
 
     /**
-     * Supprime un compte
+     * Deletes an account
      */
     public void deleteAccount(String accountNumber) {
         if (!atmRepository.getAccounts().containsKey(accountNumber)) {
@@ -54,7 +58,7 @@ public class AtmService {
     }
 
     /**
-     * Vérifie le PIN d'un compte
+     * Checks the pin of an account
      */
     public boolean verifyPin(String accountNumber, String pin) {
         Account account = atmRepository.getAccounts().get(accountNumber);
@@ -65,7 +69,9 @@ public class AtmService {
     }
 
     /**
-     * Consulte le solde d'un compte
+     * Checks the balance of an account
+     *
+     * @param accountNumber A given account nnumber
      */
     public double getBalance(String accountNumber) {
         Account account = atmRepository.getAccounts().get(accountNumber);
@@ -76,7 +82,7 @@ public class AtmService {
     }
 
     /**
-     * Effectue un dépôt
+     * Makes a deposit
      */
     public Account deposit(String accountNumber, double amount) {
         if (amount <= 0) {
@@ -94,7 +100,7 @@ public class AtmService {
     }
 
     /**
-     * Effectue un retrait
+     * Makes a withdrawal
      */
     public Account withdraw(String accountNumber, double amount) {
         if (amount <= 0) {
@@ -116,7 +122,7 @@ public class AtmService {
     }
 
     /**
-     * Effectue un virement entre deux comptes
+     * Makes a transfer between two accounts
      */
     public void transfer(String fromAccount, String toAccount, double amount) {
         if (amount <= 0) {
@@ -142,7 +148,7 @@ public class AtmService {
     }
 
     /**
-     * Récupère l'historique des transactions d'un compte
+     * Retrieves the transaction history of an account
      */
     public List<Transaction> getTransactions(String accountNumber) {
         List<Transaction> result = new ArrayList<>();
@@ -155,14 +161,14 @@ public class AtmService {
     }
 
     /**
-     * Récupère toutes les transactions
+     * Retrieves the transactions
      */
     public List<Transaction> getAllTransactions() {
         return new ArrayList<>(atmRepository.getTransactions());
     }
 
     /**
-     * Ajoute une transaction à l'historique
+     * Adds a transaction
      */
     private void addTransaction(String accountNumber, String type, double amount, double balanceAfter) {
         Transaction transaction = new Transaction(
@@ -176,7 +182,7 @@ public class AtmService {
     }
 
     /**
-     * Supprime un compte par son numéro
+     * Modifies the pin of an account
      */
     public void updatePin(String accountNumber, String newPin) {
         Account account = atmRepository.getAccounts().get(accountNumber);

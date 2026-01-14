@@ -10,10 +10,20 @@ import java.util.List;
 public class PeopleService {
     private final PeopleRepository peopleRepository;
 
+    /**
+     * Constructor for PeopleService.
+     *
+     * @param peopleRepository the repository used to manage people data
+     */
     public PeopleService(PeopleRepository peopleRepository) {
         this.peopleRepository = peopleRepository;
     }
 
+    /**
+     * Retrieves all people from the repository.
+     *
+     * @return a list of Person objects
+     */
     public List<Person> getAllPeople() {
         return peopleRepository.getPeople();
     }

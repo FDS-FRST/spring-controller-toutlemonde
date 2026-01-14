@@ -11,6 +11,9 @@ import java.util.function.Predicate;
 public class PeopleRepository {
     private final List<Person> people;
 
+    /**
+     * Initialisation avec quelques personnes de test
+     */
     public PeopleRepository() {
         people = List.of(
                 new Person("John", "Doe"),
@@ -35,6 +38,11 @@ public class PeopleRepository {
         people.add(person);
     }
 
+    /**
+     * Retrieves a person by their first name.
+     * @param firstName
+     * @return
+     */
     public Optional<Person> getPerson(String firstName) {
         return people.stream().filter(new Predicate<Person>() {
             @Override

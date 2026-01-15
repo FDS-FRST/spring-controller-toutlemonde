@@ -22,8 +22,6 @@ import java.util.Map;
 
 public class AtmControllerTemplate {
 
-
-
     private final AtmManager atmManager;
 
     /**

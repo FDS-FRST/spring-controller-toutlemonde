@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class AtmManager {
 
-    private final Map<String, Account> accounts = new ConcurrentHashMap<>();
+    public static final Map<String, Account> accounts = new ConcurrentHashMap<>();
     private final List<Transaction> transactions = Collections.synchronizedList(new ArrayList<>());
     private final AtomicInteger transactionCounter = new AtomicInteger(1);
 
@@ -53,18 +53,21 @@ public class AtmManager {
 
     /**
      * Supprime un compte
+     *
+     * @return
      */
-    public void deleteAccount(String accountNumber) {
+    public boolean deleteAccount(String accountNumber) {
         if (!accounts.containsKey(accountNumber)) {
             throw new IllegalArgumentException("Account does not exist");
         }
         accounts.remove(accountNumber);
+        return false;
     }
 
     /**
      * Vérifie le PIN d'un compte
      */
-    public boolean verifyPin(String accountNumber, String pin) {
+    public static boolean verifyPin(String accountNumber, String pin) {
         Account account = accounts.get(accountNumber);
         if (account == null) {
             return false;

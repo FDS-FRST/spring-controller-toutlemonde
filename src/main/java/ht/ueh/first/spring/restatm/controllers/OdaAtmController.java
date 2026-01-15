@@ -10,18 +10,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
-
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * Contrôleur REST pour la gestion des opérations ATM
- *
+ * <p>
  * TODO : Ajouter l'annotation @RestController
  * TODO : Ajouter l'annotation @RequestMapping avec le chemin de base "/api/atm"
  */
@@ -30,7 +28,6 @@ import java.util.Map;
 @RequestMapping("api/oda/atm")
 
 public class OdaAtmController {
-
 
 
     private final AtmManager atmManager;
@@ -45,47 +42,45 @@ public class OdaAtmController {
 
     @GetMapping("/")
 
-    public String index(){
+    public String index() {
         return "welcome to oda atm ooo";
     }
 
     /**
      * Endpoint 1 : Récupère la liste de tous les comptes
-     *
+     * <p>
      * TODO : Ajouter @GetMapping("/accounts")
      * TODO : Retourner ResponseEntity.ok() avec la liste des comptes
      */
     @GetMapping("/accounts")
 
     public ResponseEntity<List<Account>> getAllAccounts() {
-       List<Account> accounts = atmManager.getAllAccounts();
+        List<Account> accounts = atmManager.getAllAccounts();
         // TODO : Implémenter cette méthode
         return ResponseEntity.ok(accounts);
     }
 
     /**
      * Endpoint 2 : Récupère un compte spécifique par son numéro
-     *
+     * <p>
      * TODO : Ajouter @GetMapping("/accounts/{accountNumber}")
      * TODO : Ajouter @PathVariable pour extraire accountNumber
      * TODO : Retourner 404 si le compte n'existe pas
      */
     @GetMapping("/accounts/{accountNumber}")
-
-
     public ResponseEntity<Account> getAccount(
-     @PathVariable String accountNumber) {
-     Account account = atmManager.getAccountByNumber(accountNumber);
-     if (account == null) {
-     return ResponseEntity.notFound().build(); // 404
-     }
+            @PathVariable String accountNumber) {
+        Account account = atmManager.getAccount(accountNumber);
+        if (account == null) {
+            return ResponseEntity.notFound().build(); // 404
+        }
 
-     return ResponseEntity.ok(account); // 200
-     }
+        return ResponseEntity.ok(account); // 200
+    }
 
     /**
      * Endpoint 3 : Crée un nouveau compte
-     *
+     * <p>
      * TODO : Ajouter @PostMapping("/accounts")
      * TODO : Ajouter @RequestBody pour recevoir le compte en JSON
      * TODO : Retourner 201 Created en cas de succès
@@ -105,7 +100,7 @@ public class OdaAtmController {
 
     /**
      * Endpoint 4 : Consulte le solde d'un compte
-     *
+     * <p>
      * TODO : Ajouter @GetMapping("/accounts/{accountNumber}/balance")
      * TODO : Retourner un Map avec accountNumber et balance
      */
@@ -127,7 +122,7 @@ public class OdaAtmController {
 
     /**
      * Endpoint 5 : Vérifie le PIN d'un compte
-     *
+     * <p>
      * TODO : Ajouter @PostMapping("/accounts/{accountNumber}/verify-pin")
      * TODO : Recevoir le PIN dans le body (Map<String, String>)
      * TODO : Retourner un Map avec "valid" : true/false
@@ -157,7 +152,7 @@ public class OdaAtmController {
 
     /**
      * Endpoint 6 : Effectue un dépôt sur un compte
-     *
+     * <p>
      * TODO : Ajouter @PostMapping("/accounts/{accountNumber}/deposit")
      * TODO : Recevoir le montant dans le body (Map<String, Double>)
      * TODO : Extraire "amount" de la Map
@@ -185,7 +180,7 @@ public class OdaAtmController {
 
     /**
      * Endpoint 7 : Effectue un retrait sur un compte
-     *
+     * <p>
      * TODO : Ajouter @PostMapping("/accounts/{accountNumber}/withdraw")
      * TODO : Similaire au dépôt, mais avec withdraw()
      * TODO : Gérer le cas de solde insuffisant
@@ -209,7 +204,7 @@ public class OdaAtmController {
 
     /**
      * Endpoint 8 : Effectue un virement entre deux comptes
-     *
+     * <p>
      * TODO : Ajouter @PostMapping("/transfer")
      * TODO : Recevoir from, to, amount dans le body (Map<String, Object>)
      * TODO : Convertir amount en double : ((Number) request.get("amount")).doubleValue()
@@ -238,10 +233,9 @@ public class OdaAtmController {
     }
 
 
-
     /**
      * Endpoint 9 : Récupère l'historique des transactions d'un compte
-     *
+     * <p>
      * TODO : Ajouter @GetMapping("/accounts/{accountNumber}/transactions")
      * TODO : Retourner la liste des transactions
      */
@@ -257,7 +251,7 @@ public class OdaAtmController {
 
     /**
      * Endpoint 10 : Récupère toutes les transactions
-     *
+     * <p>
      * TODO : Ajouter @GetMapping("/transactions")
      * TODO : Retourner toutes les transactions du système
      */
@@ -275,30 +269,26 @@ public class OdaAtmController {
     /**
      * EXERCICE 1 : Ajouter un endpoint DELETE
      *
-     * @DeleteMapping("/accounts/{accountNumber}")
-     * - Supprime un compte
+     * @DeleteMapping("/accounts/{accountNumber}") - Supprime un compte
      * - Retourne 200 si succès, 404 si compte inexistant
      * - Note : Vous devrez d'abord ajouter la méthode deleteAccount() dans AtmManager
      */
 
     @DeleteMapping("/accounts/{accountNumber}")
     public ResponseEntity<String> deleteAccount(@PathVariable String accountNumber) {
-        boolean deleted = atmManager.deleteAccount(accountNumber);
-        if (deleted) {
+        try {
+            atmManager.deleteAccount(accountNumber);
             return ResponseEntity.ok("Account deleted successfully"); // 200 OK
-        } else {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body("Account not found"); // 404 Not Found
         }
     }
 
 
-
-
     /**
      * EXERCICE 2 : Ajouter un endpoint PUT
      *
-     * @PutMapping("/accounts/{accountNumber}/pin")
-     * - Modifie le PIN d'un compte
+     * @PutMapping("/accounts/{accountNumber}/pin") - Modifie le PIN d'un compte
      * - Body : { "oldPin": "1234", "newPin": "5678" }
      * - Vérifier l'ancien PIN avant de changer
      */
@@ -335,8 +325,7 @@ public class OdaAtmController {
     /**
      * EXERCICE 3 : Filtrer les transactions
      *
-     * @GetMapping("/accounts/{accountNumber}/transactions/deposits")
-     * - Retourne uniquement les dépôts
+     * @GetMapping("/accounts/{accountNumber}/transactions/deposits") - Retourne uniquement les dépôts
      * - Filtrer les transactions où type = "DEPOT"
      */
 
@@ -353,12 +342,6 @@ public class OdaAtmController {
         // Retounen lis depo yo
         return ResponseEntity.ok(deposits);
     }
-
-
-
-
-
-
 
 
     /**

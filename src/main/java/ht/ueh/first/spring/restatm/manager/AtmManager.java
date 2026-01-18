@@ -20,11 +20,14 @@ public class AtmManager {
         accounts.put("123456", new Account("123456", "Jean Dupont", 1000.0, "1234"));
         accounts.put("789012", new Account("789012", "Marie Martin", 2500.0, "5678"));
         accounts.put("345678", new Account("345678", "Pierre Durand", 500.0, "9012"));
+        accounts.put("654321", new Account("654321", "Calvert Wanguy", 25500.0, "5678"));
     }
 
+
+
     /**
-     * Récupère tous les comptes
-     */
+     * Récupère tous les comptes*/
+
     public List<Account> getAllAccounts() {
         return new ArrayList<>(accounts.values());
     }
@@ -36,6 +39,7 @@ public class AtmManager {
         return accounts.get(accountNumber);
     }
 
+
     /**
      * Crée un nouveau compte
      */
@@ -45,6 +49,16 @@ public class AtmManager {
         }
         accounts.put(account.getAccountNumber(), account);
         return account;
+    }
+
+    /**
+     * Supprime un compte
+     */
+    public void deleteAccount(String accountNumber) {
+        if (!accounts.containsKey(accountNumber)) {
+            throw new IllegalArgumentException("Account does not exist");
+        }
+        accounts.remove(accountNumber);
     }
 
     /**
@@ -168,5 +182,25 @@ public class AtmManager {
         );
         transactions.add(transaction);
     }
+
+    /**
+     * Modifie le PIN d'un compte
+     * @param accountNumber
+     * @param newPin
+     */
+    public void updatePin(String accountNumber, String newPin) {
+        Account account = accounts.get(accountNumber);
+        if (account == null) {
+            throw new IllegalArgumentException("Account not found");
+        }
+        account.setPin(newPin);
+    }
+
+
+
 }
+
+
+
+
 

@@ -16,13 +16,9 @@ import java.util.Map;
  * TODO : Ajouter l'annotation @RestController
  * TODO : Ajouter l'annotation @RequestMapping avec le chemin de base "/api/atm"
  */
-
 @RestController
-@RequestMapping
-
-public class AtmControllerTemplate {
-
-
+@RequestMapping("/api/Delvatm")
+public class DelvaAtmController {
 
     private final AtmManager atmManager;
 
@@ -30,7 +26,8 @@ public class AtmControllerTemplate {
      * Constructeur pour l'injection de dépendances
      * Spring injectera automatiquement l'instance d'AtmManager
      */
-    public AtmControllerTemplate(AtmManager atmManager) {
+
+    public DelvaAtmController (AtmManager atmManager) {
         this.atmManager = atmManager;
     }
 
@@ -40,9 +37,10 @@ public class AtmControllerTemplate {
      * TODO : Ajouter @GetMapping("/accounts")
      * TODO : Retourner ResponseEntity.ok() avec la liste des comptes
      */
+    @GetMapping("/accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
         // TODO : Implémenter cette méthode
-        return null;
+        return ResponseEntity.ok().body(atmManager.getAllAccounts());
     }
 
     /**
@@ -52,6 +50,8 @@ public class AtmControllerTemplate {
      * TODO : Ajouter @PathVariable pour extraire accountNumber
      * TODO : Retourner 404 si le compte n'existe pas
      */
+
+    @GetMapping("/accounts/{accountNumber}")
     public ResponseEntity<Account> getAccount(String accountNumber) {
         // TODO : Implémenter cette méthode
         return null;
